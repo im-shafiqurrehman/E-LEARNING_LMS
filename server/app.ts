@@ -13,6 +13,7 @@ import notificationRouter from "./routes/notification.route";
 import layoutRouter from "./routes/layout.route";
 import analyticsRouter from "./routes/analytics.route";
 import { rateLimit } from "express-rate-limit";
+import path from "path";
 
 //body-parser
 app.use(express.json({ limit: "50mb" }));
@@ -23,10 +24,21 @@ app.use(cookieParser());
 //cors
 app.use(
   Cors({
-    origin: ["http://localhost:3000", "http://localhost:8000"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:8000",
+      "https://e-learning-lms-dbb2.vercel.app/"
+    ],
     credentials: true,
   })
 );
+
+// Serve static files from the build folder in production
+const __dirname = path.resolve(); 
+const buildPath = path.join(__dirname, '../client/next');
+app.use(express.static(buildPath));
+
+
 // api requests limit
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
