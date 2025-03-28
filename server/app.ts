@@ -24,7 +24,6 @@ app.use(
     origin: [
       "http://localhost:3000",
       "http://localhost:8000",
-      "https://e-learning-lms-dbb2.vercel.app/"
     ],
     credentials: true,
   })
