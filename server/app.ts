@@ -67,3 +67,7 @@ app.all("*", (req: Request, res: Response, next: NextFunction) => {
 
 // ✅ Global Error Handler Middleware
 app.use(ErrorMiddleWare);
+
+
+// Export for Vercel (Important)
+export default app;
