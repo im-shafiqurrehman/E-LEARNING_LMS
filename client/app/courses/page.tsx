@@ -2,7 +2,7 @@
 import { useGetUsersAllCoursesQuery } from "@/redux/features/courses/courseApi";
 import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react"; // Import Suspense
 import Loader from "../components/Loader/Loader";
 import Header from "../components/Header";
 import Heading from "../utils/Heading";
@@ -12,27 +12,27 @@ import Footer from "../components/Footer";
 
 type Props = {};
 
-const Page = (props: Props) => {
+const CoursesContent = (props: Props) => {
   const searchParams = useSearchParams();
   const search = searchParams?.get("title");
   const { data, isLoading } = useGetUsersAllCoursesQuery(undefined, {});
   const { data: categoriesData } = useGetHeroDataQuery("Categories", {});
   const [route, setRoute] = useState("Login");
   const [open, setOpen] = useState(false);
-  const [courses, setcourses] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [category, setCategory] = useState("All");
 
   useEffect(() => {
     if (category === "All") {
-      setcourses(data?.courses);
+      setCourses(data?.courses);
     }
     if (category !== "All") {
-      setcourses(
+      setCourses(
         data?.courses.filter((item: any) => item.categories === category)
       );
     }
     if (search) {
-      setcourses(
+      setCourses(
         data?.courses.filter((item: any) =>
           item.name.toLowerCase().includes(search.toLowerCase())
         )
@@ -111,6 +111,15 @@ const Page = (props: Props) => {
         </>
       )}
     </div>
+  );
+};
+
+// Wrap the component with Suspense
+const Page = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <CoursesContent />
+    </Suspense>
   );
 };
 
