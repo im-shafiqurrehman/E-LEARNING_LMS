@@ -1,1 +1,1 @@
-This is a project with just the admin pannel. There is complete code of first two videos.
+This is a project that contains the code of the admin panel. There is the  complete code of the first two videos. There is no erros in it. Use this code for the admin panel functionality and for the authentication use the horizon impact funnd managers.
