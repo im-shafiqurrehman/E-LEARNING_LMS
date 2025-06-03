@@ -28,7 +28,7 @@ const Page = ({ params }: Props) => {
     if (error) {
       redirect("/");
     }
-  }, [data, error]);
+  }, [data, error,id]);
 
   return (
     <>

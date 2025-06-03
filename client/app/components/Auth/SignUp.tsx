@@ -27,17 +27,17 @@ const SignUp: FC<Props> = ({ setRoute }) => {
   const [register, { error, data, isSuccess }] = useRegisterMutation();
 
   useEffect(() => {
-    if (isSuccess && data) { // ✅ Ensure `data` exists before accessing `data.message`
+    if (isSuccess && data) { 
       const message = data.message || "Registration successful"; 
       toast.success(message);
-      setRoute("Verification"); // ✅ State update only if `isSuccess` is true
+      setRoute("Verification"); 
     }
   
-    if (error && "data" in error) { // ✅ Ensure `error` exists before accessing `error.data`
+    if (error && "data" in error) { 
       const errorMessage = (error as any).data.message || "Something went wrong";
       toast.error(errorMessage);
     }
-  }, [isSuccess, error, data]); // ✅ Added `data` to the dependency array
+  }, [isSuccess, error, data, setRoute]); 
   
 
 

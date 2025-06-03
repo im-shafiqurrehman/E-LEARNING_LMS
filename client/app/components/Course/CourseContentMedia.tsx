@@ -183,6 +183,12 @@ const CourseContentMedia = ({
     replyError,
     courseRefetch,
     refetch,
+    activeVideo,
+    course?.name, 
+    data,         
+    user._id,     
+    user?.name,   
+    user.role
   ]);
 
   

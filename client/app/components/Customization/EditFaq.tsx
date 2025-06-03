@@ -36,7 +36,7 @@ const EditFaq = (props: Props) => {
         toast.error(errorData?.data?.message);
       }
     }
-  }, [data, layoutSuccess, error]);
+  }, [data, layoutSuccess, error,refetch]);
 
   const toggleQuestion = (id: any) => {
     setQuestions((prevQuestions) =>
