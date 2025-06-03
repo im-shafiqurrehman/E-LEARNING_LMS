@@ -27,7 +27,7 @@ const EditCourse: FC<Props> = ({ id }) => {
   );
 
   const editCourseData = data && data.courses.find((i: any) => i._id === id);
-  console.log(editCourseData);
+  // console.log(editCourseData);
   const formattedBenefits = editCourseData.benefits.map((benefit: any) => ({
     title: benefit.title,
   }));

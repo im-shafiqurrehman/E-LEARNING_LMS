@@ -19,8 +19,8 @@ const Page = ({ params }: Props) => {
       const isPurchased = data.user.courses.find(
         (item: any) => item._id === id
       );
-      console.log(data);
-      console.log(isPurchased);
+      // console.log(data);
+      // console.log(isPurchased);
       if (!isPurchased) {
         redirect("/");
       }

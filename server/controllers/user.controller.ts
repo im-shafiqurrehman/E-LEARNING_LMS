@@ -147,7 +147,7 @@ export const activateUser = async (req: Request, res: Response, next: NextFuncti
     });
 
     await newUser.save();
-    console.log("✅ User Created Successfully:", newUser);
+    // console.log("✅ User Created Successfully:", newUser);
 
     res.status(201).json({
       success: true,

@@ -33,7 +33,7 @@ const CourseAnalytics = (props: Props) => {
     data.courses.last12Months.forEach((item: any) => {
       analyticsData.push({ name: item.month, uv: item.count });
     });
-  console.log(analyticsData);
+  // console.log(analyticsData);
   const minValue = 0;
 
   return (

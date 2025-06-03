@@ -21,7 +21,7 @@ const SideBarProfile: FC<Props> = ({
   avatar,
   logOutHandler,
 }) => {
-  console.log(user);
+  // console.log(user);
   return (
     <div className="w-full">
       <div

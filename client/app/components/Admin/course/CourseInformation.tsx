@@ -24,7 +24,7 @@ const CourseInformation: FC<Props> = ({
       setCategories(data.layout.categories);
     }
   }, [data]);
-  console.log(data);
+  // console.log(data);
   const [dragging, setDragging] = useState(false);
 
   const handleSubmit = (e: any) => {
