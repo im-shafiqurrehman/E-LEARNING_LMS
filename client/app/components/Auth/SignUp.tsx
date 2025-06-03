@@ -68,7 +68,7 @@ const SignUp: FC<Props> = ({ setRoute }) => {
             value={values.name}
             onChange={handleChange}
             id="name"
-            placeholder="johndoe"
+            placeholder="Shafiq Ur Rehman"
             className={`${errors.name && touched.name && "border-red-500"} ${
               styles.input
             }`}
