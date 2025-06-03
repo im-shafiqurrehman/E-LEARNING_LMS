@@ -20,7 +20,8 @@ app.use(cookieParser());
 app.use(
   Cors({
     origin: [
-      "http://localhost:3000",      
+      "http://localhost:3000",
+      "https://e-learning-lms-frontend-theta.vercel.app",      
     ],
     credentials: true,
   })
