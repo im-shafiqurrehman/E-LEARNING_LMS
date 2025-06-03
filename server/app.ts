@@ -1,3 +1,4 @@
+// app.ts
 import express from "express";
 export const app = express();
 import cookieParser from "cookie-parser";

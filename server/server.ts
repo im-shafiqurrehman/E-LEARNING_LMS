@@ -1,3 +1,4 @@
+// server.ts
 import { app } from "./app";
 import dotenv from "dotenv";
 import connectdb from "./utils/db";
