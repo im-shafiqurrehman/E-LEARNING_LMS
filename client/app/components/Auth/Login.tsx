@@ -9,8 +9,8 @@ import {
 } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { styles } from "../../../app/styles/style";
-import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { signIn } from "next-auth/react";
+import { useLoginMutation, useSocialAuthMutation } from "@/redux/features/auth/authApi";
+import { signIn, getSession } from "next-auth/react";
 
 interface Props {
   setRoute: (route: string) => void;
@@ -28,6 +28,8 @@ const schema = Yup.object().shape({
 const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
   const [show, setShow] = useState(false);
   const [login, { isSuccess, error, data }] = useLoginMutation();
+  const [socialAuth, { isSuccess: isSuccessGoogle, error: errorGoogle }] = useSocialAuthMutation();
+
   useEffect(() => {
     if (isSuccess) {
       const message = data?.message || "user Login successful";
@@ -41,7 +43,72 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
         toast.error(errorData.data.message);
       }
     }
-  }, [isSuccess, error, data, setOpen, refetch]); // ✅ All dependencies added
+  }, [isSuccess, error, data, setOpen, refetch]);
+
+  useEffect(() => {
+    if (isSuccessGoogle) {
+      const message = "Social login successful";
+      toast.success(message);
+      setOpen(false);
+      refetch();
+    }
+    if (errorGoogle) {
+      if ("data" in errorGoogle) {
+        const errorData = errorGoogle as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccessGoogle, errorGoogle, setOpen, refetch]);
+
+  const googleSignIn = async () => {
+    try {
+      const result = await signIn("google", {
+        redirect: false,
+      });
+      
+      if (result?.error) {
+        toast.error("Google sign in failed");
+        return;
+      }
+      
+      const session = await getSession();
+      if (session?.user) {
+        await socialAuth({
+          email: session.user.email,
+          name: session.user.name,
+          avatar: session.user.image,
+        });
+      }
+    } catch (error) {
+      toast.error("Google sign in failed");
+      console.error("Google sign in error:", error);
+    }
+  };
+
+  const githubSignIn = async () => {
+    try {
+      const result = await signIn("github", {
+        redirect: false,
+      });
+      
+      if (result?.error) {
+        toast.error("GitHub sign in failed");
+        return;
+      }
+      
+      const session = await getSession();
+      if (session?.user) {
+        await socialAuth({
+          email: session.user.email,
+          name: session.user.name,
+          avatar: session.user.image,
+        });
+      }
+    } catch (error) {
+      toast.error("GitHub sign in failed");
+      console.error("GitHub sign in error:", error);
+    }
+  };
 
   const formik = useFormik({
     initialValues: { email: "", password: "" },
@@ -122,12 +189,12 @@ const Login: FC<Props> = ({ setRoute, setOpen, refetch }) => {
           <FcGoogle
             size={30}
             className="cursor-pointer mr-2"
-            onClick={() => signIn("google")}
+            onClick={googleSignIn}
           />
           <AiFillGithub
             size={30}
             className="cursor-pointer ml-2"
-            onClick={() => signIn("github")}
+            onClick={githubSignIn}
           />
         </div>
         <h5 className="text-center pt-4 font-Poppins text-[14px]">

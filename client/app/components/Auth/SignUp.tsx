@@ -8,8 +8,9 @@ import {
 } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { styles } from "../../../app/styles/style";
-import { useRegisterMutation } from "@/redux/features/auth/authApi";
+import { useRegisterMutation, useSocialAuthMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import { signIn, getSession } from "next-auth/react";
 
 interface Props {
   setRoute: (route: string) => void;
@@ -25,6 +26,7 @@ const schema = Yup.object().shape({
 const SignUp: FC<Props> = ({ setRoute }) => {
   const [show, setShow] = useState(false);
   const [register, { error, data, isSuccess }] = useRegisterMutation();
+  const [socialAuth, { isSuccess: isSuccessGoogle, error: errorGoogle }] = useSocialAuthMutation();
 
   useEffect(() => {
     if (isSuccess && data) { 
@@ -38,6 +40,70 @@ const SignUp: FC<Props> = ({ setRoute }) => {
       toast.error(errorMessage);
     }
   }, [isSuccess, error, data, setRoute]); 
+
+  useEffect(() => {
+    if (isSuccessGoogle) {
+      const message = "Social login successful";
+      toast.success(message);
+      setRoute("Login");
+    }
+    if (errorGoogle) {
+      if ("data" in errorGoogle) {
+        const errorData = errorGoogle as any;
+        toast.error(errorData.data.message);
+      }
+    }
+  }, [isSuccessGoogle, errorGoogle, setRoute]);
+
+  const googleSignIn = async () => {
+    try {
+      const result = await signIn("google", {
+        redirect: false,
+      });
+      
+      if (result?.error) {
+        toast.error("Google sign in failed");
+        return;
+      }
+      
+      const session = await getSession();
+      if (session?.user) {
+        await socialAuth({
+          email: session.user.email,
+          name: session.user.name,
+          avatar: session.user.image,
+        });
+      }
+    } catch (error) {
+      toast.error("Google sign in failed");
+      console.error("Google sign in error:", error);
+    }
+  };
+
+  const githubSignIn = async () => {
+    try {
+      const result = await signIn("github", {
+        redirect: false,
+      });
+      
+      if (result?.error) {
+        toast.error("GitHub sign in failed");
+        return;
+      }
+      
+      const session = await getSession();
+      if (session?.user) {
+        await socialAuth({
+          email: session.user.email,
+          name: session.user.name,
+          avatar: session.user.image,
+        });
+      }
+    } catch (error) {
+      toast.error("GitHub sign in failed");
+      console.error("GitHub sign in error:", error);
+    }
+  }; 
   
 
 
@@ -140,8 +206,8 @@ const SignUp: FC<Props> = ({ setRoute }) => {
           Or join with
         </h5>
         <div className="flex items-center justify-center my-3">
-          <FcGoogle size={30} className="cursor-pointer mr-2" />
-          <AiFillGithub size={30} className="cursor-pointer ml-2" />
+          <FcGoogle size={30} className="cursor-pointer mr-2" onClick={googleSignIn} />
+          <AiFillGithub size={30} className="cursor-pointer ml-2" onClick={githubSignIn} />
         </div>
         <h5 className="text-center pt-4 font-Poppins text-[14px]">
           Already have an account?{" "}
