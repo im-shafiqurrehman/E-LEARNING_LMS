@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { Iuser } from "../models/user.model";
 import { Response } from "express";
-import { redis } from "./redis";
+import { safeRedis } from "./redis";
 
 interface ITokenOptions {
   expires: Date;
@@ -46,7 +46,9 @@ export const sendToken = (user: Iuser, statusCode: number, res: Response) => {
   const refreshToken = user.SignRefreshToken();
 
   //upload session to redis
-  redis.set(user._id, JSON.stringify(user) as any);
+  safeRedis.set(user._id, JSON.stringify(user), "EX", "604800").catch((err) => {
+    console.error("⚠️ Redis SET error:", err);
+  });
 
   // Debug logging for production
   if (process.env.NODE_ENV === "production") {

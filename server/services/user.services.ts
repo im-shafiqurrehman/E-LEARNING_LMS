@@ -1,10 +1,10 @@
 import { Response } from "express";
-import { redis } from "../utils/redis";
+import { safeRedis } from "../utils/redis";
 import userModel from "../models/user.model";
 
 //get user by id
 export const getUserById = async (id: string, res: Response) => {
-  const userjson = await redis.get(id);
+  const userjson = await safeRedis.get(id);
   if (userjson) {
     const user = JSON.parse(userjson);
     res.status(201).json({ success: true, user });
@@ -12,7 +12,7 @@ export const getUserById = async (id: string, res: Response) => {
     // If user not found in Redis, try to get from database and save to Redis
     const user = await userModel.findById(id);
     if (user) {
-      await redis.set(id, JSON.stringify(user), "EX", 604800); // 7 days
+      await safeRedis.set(id, JSON.stringify(user), "EX", "604800"); // 7 days
       res.status(201).json({ success: true, user });
     } else {
       res.status(400).json({ success: false, message: "User not found" });

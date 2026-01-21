@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import ErrorHandler from "../utils/ErrorHandler";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import sendmail from "../utils/sendMail";
-import { redis } from "../utils/redis";
+import { safeRedis } from "../utils/redis";
 import {
   accessTokenOptions,
   refreshTokenOptions,
@@ -63,7 +63,9 @@ export const registerationUser = CatchAsyncError(
           message: `Please check your email: ${user.email} to activate your account`,
           activationToken: activationToken.token,
         });
-      } catch (error) {}
+      } catch (error: any) {
+        return next(new ErrorHandler(`Failed to send activation email. Please try again later.`, 500));
+      }
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
@@ -143,7 +145,11 @@ export const activateUser = async (req: Request, res: Response, next: NextFuncti
       name,
       email,
       password,
-      avatar: "DEFAULT_AVATAR", // Change this if required
+      isverified: true,
+      avatar: {
+        public_id: "",
+        url: "https://res.cloudinary.com/dqpxfncei/image/upload/v1/avatars/default_avatar",
+      },
     });
 
     await newUser.save();
@@ -211,7 +217,7 @@ export const logoutUser = CatchAsyncError(
       res.cookie("refresh_token", "", { maxAge: 1 });
       const userId = req.user?._id || "";
 
-      redis.del(userId);
+      await safeRedis.del(userId);
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
@@ -236,7 +242,7 @@ export const updateAccessToken = CatchAsyncError(
       if (!decoded) {
         return next(new ErrorHandler(message, 400));
       }
-      const session = await redis.get(decoded.id as string);
+      const session = await safeRedis.get(decoded.id as string);
       if (!session) {
         return next(
           new ErrorHandler("Please Login to access this resource", 400)
@@ -261,7 +267,7 @@ export const updateAccessToken = CatchAsyncError(
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
-      await redis.set(user._id, JSON.stringify(user), "EX", 604800);
+      await safeRedis.set(user._id, JSON.stringify(user), "EX", 604800);
 
       res.status(200).json({
         success: true,
@@ -331,7 +337,7 @@ export const updateUserInfo = CatchAsyncError(
       }
       await user?.save();
 
-      await redis.set(userId, JSON.stringify(user));
+      await safeRedis.set(userId, JSON.stringify(user));
 
       res.status(201).json({
         success: true,
@@ -370,7 +376,7 @@ export const updatePassword = CatchAsyncError(
       user.password = newPassword;
 
       await user.save();
-      await redis.set(req.user?._id, JSON.stringify(user));
+      await safeRedis.set(req.user?._id, JSON.stringify(user));
 
       res.status(201).json({
         user,
@@ -421,7 +427,7 @@ export const updateProfilePicture = CatchAsyncError(
 
       await user?.save();
 
-      await redis.set(userId, JSON.stringify(user));
+      await safeRedis.set(userId, JSON.stringify(user));
 
       res.status(200).json({
         success: true,
@@ -481,7 +487,7 @@ export const deleteUser = CatchAsyncError(
       }
 
       await user.deleteOne({ id });
-      await redis.del(id);
+      await safeRedis.del(id);
 
       res
         .status(200)
