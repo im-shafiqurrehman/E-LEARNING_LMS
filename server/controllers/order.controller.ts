@@ -9,7 +9,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.Model";
 import { getAllOrderService, newOrder } from "../services/order.service";
-import { redis } from "../utils/redis";
+import { safeRedis } from "../utils/redis";
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 
@@ -87,7 +87,7 @@ export const createOrder = CatchAsyncError(
       }
 
       user?.courses.push(course?._id);
-      await redis.set(req.user?._id, JSON.stringify(user));
+      await safeRedis.set(req.user?._id, JSON.stringify(user));
 
       await user?.save();
 

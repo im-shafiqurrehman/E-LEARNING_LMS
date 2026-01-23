@@ -13,9 +13,10 @@ interface EmailOptions {
 const sendmail = async (options: EmailOptions): Promise<void> => {
   console.log("sendmail");
   const transporter: Transporter = nodemailer.createTransport({
+    service: process.env.SMTP_SERVICE,
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMPT_PORT || "587"),
-    service: process.env.SMPT_SERVICE,
+    port: parseInt(process.env.SMTP_PORT || "465"),
+    secure: true, // true for 465, false for other ports
     auth: {
       user: process.env.SMTP_MAIL,
       pass: process.env.SMTP_PASSWORD,
